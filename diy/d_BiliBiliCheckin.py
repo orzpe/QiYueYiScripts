@@ -158,6 +158,7 @@ def main():
     List.append(f"账号昵称：{uname}")
     List.append(f"账号等级：LV{current_level}")
     List.append(f"硬币数量：{coin}")
+    print(f"账号昵称：{uname}\n账号等级：LV{current_level}\n硬币数量：{coin}")
     if is_login:
         # 抽取视频列表
         if coin_type==0: # 从指定的分区中随机抽取视频
