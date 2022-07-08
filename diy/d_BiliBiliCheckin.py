@@ -19,7 +19,7 @@ BiliBiliRegion=""
 BiliBiliUP=""
 
 cron: 30 7 * * *
-new Env('BiliBili');
+new Env('哔哩哔哩-签到');
 """
 
 import requests,json,os,random
