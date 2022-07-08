@@ -241,7 +241,7 @@ if __name__ == "__main__":
         tt = '\n'.join(List)
         print(tt)
         if 'QYWX_Server' in os.environ:
-            push('BiliBili', tt)
+            push('哔哩哔哩', tt)
     else:
         print('未配置Cookie')
         if 'QYWX_Server' in os.environ:
