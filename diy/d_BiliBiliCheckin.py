@@ -176,27 +176,26 @@ def main():
         # 开始观看视频
         report_ret = report_task(session=session,bili_jct=bili_jct,aid=vaid,bvid=vbvid)
         if report_ret["code"]==0:
-            List.append(f"观看视频：{vtitle}")
-            print(f"观看视频：{vtitle}")
+            msg = f"观看视频：{vtitle}"
             vidoe_exp = 5
         else:
-            List.append(f"观看视频：任务失败")
-            print(f"观看视频：任务失败")
+            msg = f"观看视频：任务失败"
             vidoe_exp = 0
+        List.append(msg)
+        print(msg)
         # 开始分享
         sharevideo = share_task(session,bili_jct,vaid)
         if sharevideo["code"]==0:
             List.append(f'分享成功：{vtitle}')
-            print(f'分享成功：{vtitle}')
             share_exp=5
         elif sharevideo["code"]==71000:
             List.append(f'重复分享：{vtitle}')
-            print(f'重复分享：{vtitle}')
             share_exp=5
         else:
-            List.append(f'分享任务：{vtitle}{sharevideo["message"]}')
-            print(f'分享任务：{vtitle}{sharevideo["message"]}')
+            msg = f'分享任务：{vtitle}{sharevideo["message"]}'
             share_exp=0
+        List.append(msg)
+        print(msg)
         if coin_num > 0:
             success_coin = get_coin(session)
             for videomsg in video_list[::-1]:
@@ -207,20 +206,19 @@ def main():
                 ret = coin_add(session,bili_jct,aid)
                 if ret["code"]==0:
                     success_coin+=1
-                    List.append(f'投币成功：{title}：')
-                    print(f'投币成功：{title}：')
+                    msg = f'投币成功：{title}'
                 elif ret["code"]==34005:
-                    List.append(f'投币失败：{title}，{ret["message"]}')
-                    print(f'投币失败：{title}，{ret["message"]}')
+                    msg = f'投币失败：{title}，{ret["message"]}'
                 else:
-                    List.append(f'投币失败：{title}，{ret["message"]}，跳过投币')
-                    print(f'投币失败：{title}，{ret["message"]}，跳过投币')
+                    msg = f'投币失败：{title}，{ret["message"]}，跳过投币'
                     break
-            List.append(f"投币任务：已投币{success_coin}个")
-            print(f"投币任务：已投币{success_coin}个")
+                List.append(msg)
+                print(msg)
+            msg = f"投币任务：已投币{success_coin}个"
         else:
-            List.append("投币任务：无需投币")
-            print("投币任务：无需投币")
+            msg = "投币任务：无需投币"
+        List.append(msg)
+        print(msg)
         # 结束
         today_exp = success_coin*10+share_exp+vidoe_exp+5
         List.append(f"今日经验：{today_exp}")
