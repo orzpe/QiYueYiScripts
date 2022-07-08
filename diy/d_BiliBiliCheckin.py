@@ -22,6 +22,7 @@ cron: 30 7 * * *
 new Env('哔哩哔哩-签到');
 """
 
+from time import sleep
 import requests,json,os,random
 from datetime import datetime
 
@@ -168,11 +169,35 @@ def main():
             mid = random.randint(0,len(UP_mid)-1)
             video_list = space_arc_search(session,uid=UP_mid[mid])
             print(f"抽取UP：{UP_mid[mid]}")
+        vlist = random.randint(0,len(video_list)-1)
+        vaid = video_list[vlist]["aid"]
+        vbvid = video_list[vlist]["bvid"]
+        vtitle = video_list[vlist]["title"] 
+        # 开始观看视频
+        report_ret = report_task(session=session,bili_jct=bili_jct,aid=vaid,bvid=vbvid)
+        if report_ret["code"]==0:
+            List.append(f"观看视频：{vtitle}")
+            vidoe_exp = 5
+        else:
+            List.append(f"观看视频：任务失败")
+            vidoe_exp = 0
+        sleep(500)
+        # 开始分享
+        sharevideo = share_task(session,bili_jct,vaid)
+        if sharevideo["code"]==0:
+            List.append(f'分享成功：{vtitle}')
+            share_exp=5
+        elif sharevideo["code"]==71000:
+            List.append(f'重复分享：{vtitle}')
+            share_exp=5
+        else:
+            List.append(f'分享任务：{vtitle}{sharevideo["message"]}')
+            share_exp=0
+        sleep(500)
         if coin_num > 0:
             success_coin = get_coin(session)
             for videomsg in video_list[::-1]:
                 aid = videomsg["aid"]
-                bvid = videomsg["bvid"]
                 title = videomsg["title"]
                 if success_coin >= coin_num:
                     break
@@ -185,28 +210,10 @@ def main():
                 else:
                     List.append(f'投币失败：{title}，{ret["message"]}，跳过投币')
                     break
+                sleep(500)
             List.append(f"投币任务：已投币{success_coin}个")
         else:
             List.append("投币任务：无需投币")
-        # 开始分享
-        sharevideo = share_task(session,bili_jct,aid)
-        if sharevideo["code"]==0:
-            List.append(f'分享成功：{title}')
-            share_exp=5
-        elif sharevideo["code"]==71000:
-            List.append(f'重复分享：{title}')
-            share_exp=5
-        else:
-            List.append(f'分享任务：{title}{sharevideo["message"]}')
-            share_exp=0
-        # 开始观看视频
-        report_ret = report_task(session=session,bili_jct=bili_jct,aid=aid,bvid=bvid)
-        if report_ret["code"]==0:
-            List.append(f"观看视频：{title}")
-            vidoe_exp = 5
-        else:
-            List.append(f"观看视频：任务失败")
-            vidoe_exp = 0
         # 结束
         today_exp = success_coin*10+share_exp+vidoe_exp+5
         List.append(f"今日经验：{today_exp}")
