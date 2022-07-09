@@ -208,12 +208,12 @@ def main():
                 if ret["code"]==0:
                     success_coin+=1
                     msg = f'投币成功：{title}'
+                    List.append(msg)
                 elif ret["code"]==34005:
                     msg = f'投币失败：{title}，{ret["message"]}'
                 else:
                     msg = f'投币失败：{title}，{ret["message"]}，跳过投币'
                     break
-                List.append(msg)
                 print(msg)
             msg = f"投币任务：已投币{success_coin}个"
         else:
