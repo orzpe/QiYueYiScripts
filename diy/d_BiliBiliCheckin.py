@@ -32,8 +32,8 @@ List = []
 def get_nav(session):
     url = "https://api.bilibili.com/x/web-interface/nav"
     ret = session.get(url=url).json()
-    uname = ret["data"]["uname"] # 用户名
     is_login = ret["data"]["isLogin"] # 登录状态
+    uname = ret["data"]["uname"] # 用户名
     coin = ret["data"]["money"] # 硬币数量
     current_level = ret["data"]["level_info"]["current_level"] # 当前等级
     current_exp = ret["data"]["level_info"]["current_exp"] # 经验值
@@ -187,10 +187,10 @@ def main():
         # 开始分享
         sharevideo = share_task(session,bili_jct,vaid)
         if sharevideo["code"]==0:
-            List.append(f'分享成功：{vtitle}')
+            msg = f'分享成功：{vtitle}'
             share_exp=5
         elif sharevideo["code"]==71000:
-            List.append(f'重复分享：{vtitle}')
+            msg = f'重复分享：{vtitle}'
             share_exp=5
         else:
             msg = f'分享任务：{vtitle}{sharevideo["message"]}'
