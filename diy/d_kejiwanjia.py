@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 """
-说明: 环境变量`KJWJ_UP`账号密码`-`分割
+# 账号密码用 - 分割，多个账号之间用 & 分割
+# KJWJ_UP="abcd@qq.com-abcd123456&efgh@qq.com-efgh123456"
+
 cron: 30 7 * * *
 new Env('科技玩家-签到');
 """
