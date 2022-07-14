@@ -44,8 +44,9 @@ def get_nav(session):
         current_level = ""
         current_exp = ""
         next_exp = ""
-        List.append(f"登录状态：{ret["message"]}")
-        print(ret["message"])
+        msg = ret["message"]
+        List.append(f"登录状态：{msg}")
+        print(msg)
     is_login = ret["data"]["isLogin"] # 登录状态
     return is_login,uname,coin,current_level,current_exp,next_exp
 
