@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 """
+所有变量均可设置在青龙的环境变量里面
 # B站Cookie，可设置多个Cookie，Cookie之间用 & 隔开，如果Cookie里有特殊字符请转义
 BiliBiliCookie=""
 
