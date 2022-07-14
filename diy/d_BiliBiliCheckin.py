@@ -38,7 +38,7 @@ def get_nav(session):
         msg = ret["message"]
         List.append(f"登录状态：{msg}")
         print(msg)
-        return false
+    return false
 
 # 获取今日已投币数量
 def get_coin(session):
