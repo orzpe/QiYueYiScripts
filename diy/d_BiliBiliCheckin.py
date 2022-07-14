@@ -33,22 +33,12 @@ def get_nav(session):
     url = "https://api.bilibili.com/x/web-interface/nav"
     ret = session.get(url=url).json()
     if ret["code"] == 0:
-        uname = ret["data"]["uname"] # 用户名
-        coin = ret["data"]["money"] # 硬币数量
-        current_level = ret["data"]["level_info"]["current_level"] # 当前等级
-        current_exp = ret["data"]["level_info"]["current_exp"] # 经验值
-        next_exp = ret["data"]["level_info"]["next_exp"] # 下一等级所需经验值
+        return ret["data"]
     else:
-        unmae = ""
-        coin = ""
-        current_level = ""
-        current_exp = ""
-        next_exp = ""
         msg = ret["message"]
         List.append(f"登录状态：{msg}")
         print(msg)
-    is_login = ret["data"]["isLogin"] # 登录状态
-    return is_login,uname,coin,current_level,current_exp,next_exp
+        return false
 
 # 获取今日已投币数量
 def get_coin(session):
@@ -164,8 +154,13 @@ def main():
         "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
         "Connection": "keep-alive",
     })
-    is_login,uname,coin,current_level,current_exp,next_exp = get_nav(session) # 获取当前用户信息
-    if is_login:
+    userInfo = get_nav(session) # 获取当前用户信息
+    if userInfo:
+        uname = userInfo["uname"] # 用户名
+        coin = userInfo["money"] # 硬币数量
+        current_level = userInfo["level_info"]["current_level"] # 当前等级
+        current_exp = userInfo["level_info"]["current_exp"] # 经验值
+        next_exp = userInfo["level_info"]["next_exp"] # 下一等级所需经验值登录状态
         List.append(f"账号昵称：{uname}")
         List.append(f"账号等级：LV{current_level}")
         List.append(f"硬币数量：{coin}")
