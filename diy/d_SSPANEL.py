@@ -3,8 +3,8 @@ import requests,os,json
 
 """
 环境变量：SSPANEL
-变量格式：域名-账号-密码，多个站点使用 ; 隔开
-例如 SSPANEL="https://abc.com-abc@qq.com-abc123456;https://abc.com-abc@qq.com-abc123456;"
+变量格式：域名-账号-密码，多个站点使用 & 隔开
+例如 SSPANEL="https://abc.com-abc@qq.com-abc123456&https://abc.com-abc@qq.com-abc123456&"
 cron: 30 7 * * *
 new Env('SSPANEL-签到');
 """
@@ -67,7 +67,7 @@ if __name__ == "__main__":
         touser = qywx[2]
         agentid = qywx[3]
     if 'SSPANEL' in os.environ:
-        users = os.environ['SSPANEL'].split(';')
+        users = os.environ['SSPANEL'].split('&')
         for x in users:
             url,email,password = x.split('-')
             List.append(f"站点信息：{url}")
