@@ -177,7 +177,7 @@ def main():
         # 开始观看视频
         report_ret = report_task(session=session,bili_jct=bili_jct,aid=vaid,bvid=vbvid)
         if report_ret["code"]==0:
-            msg = f"观看视频：{vtitle}"
+            msg = f"观看视频：{vbvid}"
             vidoe_exp = 5
         else:
             msg = f"观看视频：任务失败"
@@ -187,13 +187,13 @@ def main():
         # 开始分享
         sharevideo = share_task(session,bili_jct,vaid)
         if sharevideo["code"]==0:
-            msg = f'分享成功：{vtitle}'
+            msg = f'分享成功：{vbvid}'
             share_exp=5
         elif sharevideo["code"]==71000:
-            msg = f'重复分享：{vtitle}'
+            msg = f'重复分享：{vbvid}'
             share_exp=5
         else:
-            msg = f'分享任务：{vtitle}{sharevideo["message"]}'
+            msg = f'分享任务：{vbvid}{sharevideo["message"]}'
             share_exp=0
         List.append(msg)
         print(msg)
@@ -201,18 +201,19 @@ def main():
             success_coin = get_coin(session)
             for videomsg in video_list[::-1]:
                 aid = videomsg["aid"]
-                title = videomsg["title"]
+                bvid = videomsg["bvid"]
+                # title = videomsg["title"]
                 if success_coin >= coin_num:
                     break
                 ret = coin_add(session,bili_jct,aid)
                 if ret["code"]==0:
                     success_coin+=1
-                    msg = f'投币成功：{title}'
+                    msg = f'投币成功：{bvid}'
                     List.append(msg)
                 elif ret["code"]==34005:
-                    msg = f'投币失败：{title}，{ret["message"]}'
+                    msg = f'投币失败：{bvid}，{ret["message"]}'
                 else:
-                    msg = f'投币失败：{title}，{ret["message"]}，跳过投币'
+                    msg = f'投币失败：{bvid}，{ret["message"]}，跳过投币'
                     break
                 print(msg)
             msg = f"投币任务：已投币{success_coin}个"
