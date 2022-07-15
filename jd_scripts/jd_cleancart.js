@@ -2,7 +2,7 @@
 清空购物车
 脚本来源于：https://github.com/smiek2121/scripts
 修改时间：2022-06-29
-适配https://api-windfgg.doc.coding.io/的算法
+适配https://t.me/Wall_E_Channel的算法
 因其他脚本会加入商品到购物车，故此脚本用来清空购物车，包括预售
 需要算法支持
 默认：不执行 如需要请添加环境变量
