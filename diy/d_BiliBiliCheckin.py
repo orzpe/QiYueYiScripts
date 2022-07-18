@@ -3,7 +3,7 @@
 """
 所有变量均可设置在青龙的环境变量里面
 # B站Cookie，可设置多个Cookie，Cookie之间用 & 隔开，如果Cookie里有特殊字符请转义
-BiliBiliCookie=""
+BiliBili_COOKIE=""
 
 # 投币数量，默认为0
 BiliBiliCoin=""
@@ -242,8 +242,8 @@ if __name__ == "__main__":
         corpsecret = qywx[1]
         touser = qywx[2]
         agentid = qywx[3]
-    if 'BiliBiliCookie' in os.environ:
-        users = os.environ['BiliBiliCookie'].split('&')
+    if 'BiliBili_COOKIE' in os.environ:
+        users = os.environ['BiliBili_COOKIE'].split('&')
         coin_num = 0
         coin_type = 0
         video_type = ["全部"]
