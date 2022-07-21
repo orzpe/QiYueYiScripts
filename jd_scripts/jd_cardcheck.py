@@ -107,7 +107,7 @@ def main():
     else:
         print("没有新增开卡脚本")
     with open("./tree.json","w") as f:
-        print("保存当前目录树")
+        print("保存数据到tree.json文件")
         json.dump(tree,f)
 
 if 'GitRepoHost' in os.environ:
