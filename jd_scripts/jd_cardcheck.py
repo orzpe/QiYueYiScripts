@@ -5,7 +5,7 @@
 # 需要安装第三方依赖：deepdiff
 
 # 要监控的GitHub仓库，例如监控的仓库为：https://github.com/opencard/scripts
-# 则填写连接中的用户名和仓库名，如下
+# 则填写链接中的用户名和仓库名，如下
 export GitRepoHost="opencard/scripts"
 
 cron: */5 0-6 * * *
