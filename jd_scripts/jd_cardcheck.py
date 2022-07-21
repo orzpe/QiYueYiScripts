@@ -84,7 +84,8 @@ def main():
                 print(f"新增开卡：{scripts_name}")
                 # 拉库运行开卡脚本
                 headers['Authorization']='Bearer '+token
-                qlrun(scripts_name)
+                content = qlrun(scripts_name)
+                send("开卡更新检测",content)
             else:
                 print("仓库有更新，但没有新增开卡脚本")
             break
