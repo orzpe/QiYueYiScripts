@@ -114,7 +114,7 @@ def main():
 
 if 'GitRepoHost' in os.environ:
     GitRepo = os.environ['GitRepoHost']
-    print(f"监控仓库： https://github.com/{GitRepo}")
+    print(f"监控仓库：https://github.com/{GitRepo}")
     api = f'https://api.github.com/repos/{GitRepo}/git/trees/main'
     host = 'http://127.0.0.1:5700/api'
     headers = {
