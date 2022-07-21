@@ -5,14 +5,14 @@
 # 如果有则自动拉库并运行开卡脚本
 # 此脚本需要安装第三方依赖：deepdiff
 # 填写要监控的GitHub仓库的用户名和仓库名
-export GitRepoHost="opencard/scripts"
+export GitRepoHost="QiYueYiya/scripts"
 
 cron: */5 0-6 * * *
 new Env('开卡更新检测')
 """
 
 from time import sleep
-import requests,json,deepdiff,os
+import requests,deepdiff,json,os
 
 # 获取脚本ID
 def qlcron(name):
@@ -39,12 +39,13 @@ def qlrun(scripts_name):
     url = host+"/crons/run"
     # 向请求头添加青龙登录Token
     headers['Authorization']='Bearer '+token
-    GitPath = GitRepo.split("/")
+    # 获取仓库任务ID
     RepoName,RepoID = qlcron(GitRepo)
     if not RepoName:
         print(f"获取任务ID失败：{GitRepo}")
         return
     # 运行拉取仓库任务
+    GitPath = GitRepo.split("/")
     File = os.path.exists("/ql/scripts/"+GitPath[0]+"_"+GitPath[1]+"/"+scripts_name)
     while not File:
         print(f"目标文件夹没有{scripts_name}文件，即将更新仓库")
@@ -56,11 +57,12 @@ def qlrun(scripts_name):
             print("错误信息："+json.loads(rsp.text)["message"])
         sleep(10)
         File = os.path.exists("/ql/scripts/"+GitPath[0]+"_"+GitPath[1]+"/"+scripts_name)
-    # 运行开卡任务
+    # 获取开卡任务ID
     TaskName,TaskID = qlcron(scripts_name)
     if not TaskName:
         print(f"获取任务ID失败：{scripts_name}")
         return
+    # 运行开卡任务
     rsp = session.put(url=url,headers=headers,data=json.dumps(TaskID))
     if rsp.status_code == 200:
         print(f"运行任务：{TaskName}")
