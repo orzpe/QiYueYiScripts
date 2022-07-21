@@ -12,7 +12,6 @@ cron: */5 0-6 * * *
 new Env('开卡更新检测')
 """
 
-from notify import send
 from time import sleep
 import requests,json,deepdiff,os
 
@@ -43,7 +42,7 @@ def qlrun(scripts_name):
             print(f"运行任务：{RepoName}")
         else:
             print(f'请求失败：{url}')
-        sleep(5000)
+        sleep(10)
         File = os.path.exists("/ql/scripts/"+GitPath[0]+"_"+GitPath[1]+"/"+scripts_name)
     # 运行开卡任务
     TaskName,TaskID = qlcron(scripts_name)
@@ -85,8 +84,7 @@ def main():
                 print(f"新增开卡：{scripts_name}")
                 # 拉库运行开卡脚本
                 headers['Authorization']='Bearer '+token
-                content = qlrun(scripts_name)
-                send("开卡更新检测",content)
+                qlrun(scripts_name)
             else:
                 print("仓库有更新，但没有新增开卡脚本")
             break
