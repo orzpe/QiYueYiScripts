@@ -12,6 +12,7 @@ cron: */5 0-6 * * *
 new Env('开卡更新检测')
 """
 
+from notify import send
 from time import sleep
 import requests,json,deepdiff,os
 
