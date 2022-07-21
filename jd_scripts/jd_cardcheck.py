@@ -106,7 +106,6 @@ if 'GitRepoHost' in os.environ:
     }
     session = requests.session()
     main()
-    
 else:
     print("请查看脚本注释后设置相关变量")
  
