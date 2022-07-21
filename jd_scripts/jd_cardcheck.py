@@ -95,8 +95,6 @@ def main():
 
 if 'GitRepoHost' in os.environ:
     GitRepo = os.environ['GitRepoHost']
-    if "GitCronID" in os.environ:
-        cronid = [os.environ['GitCronID']]
     api = f'https://api.github.com/repos/{GitRepo}/git/trees/main'
     host = 'http://127.0.0.1:5700/api'
     # 读取青龙登录token
