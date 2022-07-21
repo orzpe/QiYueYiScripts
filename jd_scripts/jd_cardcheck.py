@@ -21,7 +21,7 @@ def qlcron(name):
     rsp = session.get(url=url, headers=headers)
     jsons = json.loads(rsp.text)
     if rsp.status_code == 200:
-        print("获取任务 "+jsons["data"][0]["name"]+" ID成功")
+        print("获取任务ID成功："+jsons["data"][0]["name"])
         return jsons["data"][0]["name"],[jsons["data"][0]["_id"]]
     else:
         print(f'请求失败：{url}')
@@ -32,7 +32,7 @@ def qlrun(scripts_name):
     GitPath = GitRepo.split("/")
     RepoName,RepoID = qlcron(GitRepo)
     if not RepoName:
-        print(f"获取 {GitRepo} 任务ID失败")
+        print(f"获取任务ID失败：{GitRepo}")
         return
     # 运行拉取仓库任务
     File = os.path.exists("/ql/scripts/"+GitPath[0]+"_"+GitPath[1]+"/"+scripts_name)
@@ -47,7 +47,7 @@ def qlrun(scripts_name):
     # 运行开卡任务
     TaskName,TaskID = qlcron(scripts_name)
     if not TaskName:
-        print(f"获取 {scripts_name} 任务ID失败")
+        print(f"获取任务ID失败：{scripts_name}")
         return
     rsp = session.put(url=url,headers=headers,data=json.dumps(TaskID))
     if rsp.status_code == 200:
@@ -62,13 +62,15 @@ def main():
     if rsp.status_code != 200:
         print(f'请求失败：{api}')
         return
+    # 只保存目录中的文件名信息
     tree = []
     for x in json.loads(rsp.text)["tree"]:
         tree.append(x["path"])
+    # 查看是否有目录树json
     if not os.path.exists("./tree.json"):
         with open("./tree.json","w") as f:
             json.dump(tree,f)
-        print("没有已保存的目录树，将保存当前目录树，以便于下次运行")
+        print("当前没有已保存的目录树，将保存当前目录树")
     # 读取上一次保存的目录树并与当前目录树进行对比
     with open("./tree.json", 'rb') as json_file:
         tree_json = json.load(json_file)
