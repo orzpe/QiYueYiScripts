@@ -7,6 +7,10 @@
 # 填写要监控的GitHub仓库的用户名和仓库名
 export GitRepoHost="QiYueYiya/scripts"
 
+## 参考文档：http://note.youdao.com/s/HMiudGkb
+## 下方填写（corpid,corpsecret,touser,agentid）
+export QYWX_AM=""
+
 cron: */5 0-6 * * *
 new Env('开卡更新检测')
 """
@@ -141,7 +145,7 @@ def main():
         json.dump(tree,f)
     tt = '\n'.join(List)
     print(tt)
-    if state:
+    if state and qywx:
         push('监控开卡', tt)
 
 if 'QYWX_Server' in os.environ:
@@ -150,6 +154,9 @@ if 'QYWX_Server' in os.environ:
     corpsecret = qywx[1]
     touser = qywx[2]
     agentid = qywx[3]
+else:
+    qywx = False
+    print("未填写通知变量QYWX_Server，将不进行推送")
 if 'GitRepoHost' in os.environ:
     List = []
     GitRepo = os.environ['GitRepoHost']
