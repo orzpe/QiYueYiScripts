@@ -1,6 +1,6 @@
 //问题反馈:https://t.me/Wall_E_Channel
 /*
-7 7 7 7 7 m_jd_wx_collectCard.js
+0 12 1 1 1 m_jd_wx_collectCard.js
 */
 let mode = __dirname.includes('magic')
 const {Env} = mode ? require('./magic') : require('./magic')
