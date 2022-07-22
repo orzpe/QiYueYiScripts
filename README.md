@@ -10,5 +10,5 @@
 
 任务 :
 ```
-ql repo https://github.com/feverrun/my_scripts.git "jd_|jx_|jddj_|getCookie|getJDCookie" "backUp" "^(jd|JD|JS)[^_]|USER|sendNotify|utils"
+ql repo https://github.com/QiYueYiya/scripts.git "d_|jd_" "" "jdCookie|notify|USER"
 ```
