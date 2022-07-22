@@ -5,6 +5,7 @@
  * 无助力活动 助力码无用
  * 活动入口：京东APP搜索领现金进入
  * 满30提现 目前有3、8、15、30的红包
+ * 适配https://t.me/Wall_E_Channel的算法
 cron "0 11 * * *" script-path=jd_cash.js,tag=签到领现金
  */
  const $ = new Env('签到领现金');
