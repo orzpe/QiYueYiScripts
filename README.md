@@ -3,6 +3,8 @@
 ## Telegram
 [群聊](https://t.me/qiyueyigroup) 
 
+[频道](https://t.me/qiyueyichat) 
+
 ## 定时更新库
 任务名:   myScripts
 
