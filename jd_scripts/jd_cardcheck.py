@@ -140,9 +140,8 @@ def main():
         List.append("保存数据到tree.json文件")
         json.dump(tree,f)
     tt = '\n'.join(List)
-#     print(tt)
+    print(tt)
     if state:
-        print(tt)
         push('监控开卡', tt)
 
 if 'QYWX_Server' in os.environ:
