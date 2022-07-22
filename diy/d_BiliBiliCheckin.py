@@ -33,6 +33,7 @@ List = []
 def get_nav(session):
     url = "http://api.bilibili.com/x/space/myinfo"
     ret = session.get(url=url).json()
+    # print(ret)
     if ret["code"] == 0:
         return ret["data"]
     else:
@@ -243,8 +244,8 @@ if __name__ == "__main__":
         corpsecret = qywx[1]
         touser = qywx[2]
         agentid = qywx[3]
-    if 'BiliBili_COOKIE' in os.environ:
-        users = os.environ['BiliBili_COOKIE'].split('&')
+    if 'BiliBiliCookie' in os.environ:
+        users = os.environ['BiliBiliCookie'].split('&')
         coin_num = 0
         coin_type = 0
         video_type = ["全部"]
