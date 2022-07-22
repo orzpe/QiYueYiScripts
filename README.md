@@ -4,7 +4,7 @@
 [群聊](https://t.me/qiyueyigroup)  [频道](https://t.me/qiyueyichat) 
 
 ## 定时更新库
-任务名:   myScripts
+任务名:   QiYueYiScripts
 
 定时 :    50 23 * * *
 
