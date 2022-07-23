@@ -91,7 +91,7 @@ def qlrun(scripts_name):
         sleep(10)
         File = os.path.exists("/ql/scripts/"+GitRepoHost[0]+"_"+GitRepoHost[1]+"/"+scripts_name)
     else:
-        List.append(f"已找到{scripts_name}文件，即将检查是否创建相关任务")
+        List.append(f"已找到{scripts_name}文件，即将获取开卡任务ID")
     # 获取开卡任务ID
     TaskName,TaskID = qlcron(scripts_name)
     if not TaskName:
