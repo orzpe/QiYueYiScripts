@@ -51,12 +51,12 @@ def qlcron(name):
     url = host+"/crons?searchValue="+name
     rsp = session.get(url=url, headers=headers)
     jsons = rsp.json()
-    if rsp.status_code == 200:
+    if (rsp.status_code == 200) and (jsons != None):
         List.append("获取任务ID成功："+jsons["data"][0]["name"])
         return jsons["data"][0]["name"],[jsons["data"][0]["_id"]]
     else:
         List.append(f'请求失败：{url}')
-        List.append("错误信息："+rsp.json()["message"])
+        List.append("错误信息："+jsons["message"])
         return False,False
 
 def qlrun(scripts_name):
@@ -75,11 +75,10 @@ def qlrun(scripts_name):
     # 获取仓库任务ID
     RepoName,RepoID = qlcron(GitRepo)
     if not RepoName:
-        List.append(f"获取任务ID失败：{GitRepo}")
+        List.append(f"获取仓库任务ID失败：{GitRepo}")
         return
     # 运行拉取仓库任务
-    GitPath = GitRepo.split("/")
-    File = os.path.exists("/ql/scripts/"+GitPath[0]+"_"+GitPath[1]+"/"+scripts_name)
+    File = os.path.exists("/ql/scripts/"+GitRepoHost[0]+"_"+GitRepoHost[1]+"/"+scripts_name)
     while not File:
         List.append(f"没有找到{scripts_name}文件，即将更新仓库")
         rsp = session.put(url=url,headers=headers,data=json.dumps(RepoID))
@@ -90,11 +89,13 @@ def qlrun(scripts_name):
             List.append("错误信息："+rsp.json()["message"])
             return
         sleep(10)
-        File = os.path.exists("/ql/scripts/"+GitPath[0]+"_"+GitPath[1]+"/"+scripts_name)
+        File = os.path.exists("/ql/scripts/"+GitRepoHost[0]+"_"+GitRepoHost[1]+"/"+scripts_name)
+    else:
+        List.append(f"已找到{scripts_name}文件，即将检查是否创建相关任务")
     # 获取开卡任务ID
     TaskName,TaskID = qlcron(scripts_name)
     if not TaskName:
-        List.append(f"获取任务ID失败：{scripts_name}")
+        List.append(f"获取开卡任务ID失败：{scripts_name}")
         return
     # 禁用开卡任务
     if 'opencardDisable' in os.environ:
@@ -117,6 +118,7 @@ def qlrun(scripts_name):
         List.append("错误信息："+rsp.json()["message"])
         
 def main():
+    state = True
     # 请求Github仓库获取目录树
     rsp = session.get(url=api,headers=headers)
     if rsp.status_code != 200:
@@ -171,13 +173,12 @@ if 'QYWX_Server' in os.environ:
 if 'GitRepoHost' in os.environ:
     List = []
     GitRepoHost = os.environ['GitRepoHost'].split("/")
-    GitRepo = GitRepoHost[0]+GitRepoHost[1]
-    GitBranch = GitRepoHost[3]
+    GitRepo = GitRepoHost[0]+"/"+GitRepoHost[1]
+    GitBranch = GitRepoHost[2]
     List.append(f"监控仓库：https://github.com/{GitRepo}")
     api = f'https://api.github.com/repos/{GitRepo}/git/trees/{GitBranch}'
     host = 'http://127.0.0.1:5700/api'
     headers = {
-        'accept': 'application/json',
         "Content-Type": "application/json;charset=UTF-8"
     }
     session = requests.session()
