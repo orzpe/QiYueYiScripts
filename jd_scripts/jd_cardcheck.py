@@ -93,6 +93,18 @@ def qlrun(scripts_name):
     if not TaskName:
         List.append(f"获取任务ID失败：{scripts_name}")
         return
+    # 禁用开卡任务
+    if 'opencardDisable' in os.environ:
+        Disable = os.environ['opencardDisable']
+        if Disable=="true":
+            vurl = host+"/crons/disable"
+            rsp = session.put(url=vurl,headers=headers,data=json.dumps(TaskID))
+            if rsp.status_code == 200:
+                List.append(f"禁用任务：{TaskName}")
+            else:
+                List.append(f'请求失败：{url}')
+                List.append("错误信息："+rsp.json()["message"])
+                return
     # 运行开卡任务
     rsp = session.put(url=url,headers=headers,data=json.dumps(TaskID))
     if rsp.status_code == 200:
@@ -100,19 +112,7 @@ def qlrun(scripts_name):
     else:
         List.append(f'请求失败：{url}')
         List.append("错误信息："+rsp.json()["message"])
-        return
-    # 禁用开卡任务
-    if 'opencardDisable' in os.environ:
-        Disable = os.environ['opencardDisable']
-        if Disable=="true":
-            url = host+"/crons/disable"
-            rsp = session.put(url=url,headers=headers,data=json.dumps(TaskID))
-            if rsp.status_code == 200:
-                List.append(f"禁用任务：{TaskName}")
-            else:
-                List.append(f'请求失败：{url}')
-                List.append("错误信息："+rsp.json()["message"])
-
+        
 def main():
     # 请求Github仓库获取目录树
     rsp = session.get(url=api,headers=headers)
