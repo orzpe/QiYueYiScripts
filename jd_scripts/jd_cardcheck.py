@@ -4,8 +4,8 @@
 # 通过监控Github仓库来查看是否有新的开卡脚本
 # 如果有则自动拉库并运行开卡脚本
 # 此脚本需要安装第三方依赖：deepdiff
-# 填写要监控的GitHub仓库的用户名和仓库名
-export GitRepoHost="QiYueYiya/scripts"
+# 填写要监控的GitHub仓库的用户名和仓库名和分支
+export GitRepoHost="QiYueYiya/scripts/main"
 # 要监控的脚本关键词，不填默认为opencard
 export GitScripts="opencard"
 # 运行完开卡脚本后禁用开卡脚本定时任务，false为不禁用
@@ -170,9 +170,11 @@ if 'QYWX_Server' in os.environ:
     agentid = qywx[3]
 if 'GitRepoHost' in os.environ:
     List = []
-    GitRepo = os.environ['GitRepoHost']
+    GitRepoHost = os.environ['GitRepoHost'].split("/")
+    GitRepo = GitRepoHost[0]+GitRepoHost[1]
+    GitBranch = GitRepoHost[3]
     List.append(f"监控仓库：https://github.com/{GitRepo}")
-    api = f'https://api.github.com/repos/{GitRepo}/git/trees/main'
+    api = f'https://api.github.com/repos/{GitRepo}/git/trees/{GitBranch}'
     host = 'http://127.0.0.1:5700/api'
     headers = {
         'accept': 'application/json',
