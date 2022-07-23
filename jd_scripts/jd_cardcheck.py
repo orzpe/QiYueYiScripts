@@ -51,9 +51,12 @@ def qlcron(name):
     url = host+"/crons?searchValue="+name
     rsp = session.get(url=url, headers=headers)
     jsons = rsp.json()
-    if (rsp.status_code == 200) and (jsons != None):
-        List.append("获取任务ID成功："+jsons["data"][0]["name"])
-        return jsons["data"][0]["name"],[jsons["data"][0]["_id"]]
+    if rsp.status_code == 200:
+        if jsons["data"] == None:
+            List.append("没有找到任务，无法获取任务ID")
+        else:
+            List.append("获取任务ID成功："+jsons["data"][0]["name"])
+            return jsons["data"][0]["name"],[jsons["data"][0]["_id"]]
     else:
         List.append(f'请求失败：{url}')
         List.append("错误信息："+jsons["message"])
