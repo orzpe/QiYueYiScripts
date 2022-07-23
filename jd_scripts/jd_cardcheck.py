@@ -6,6 +6,8 @@
 # 此脚本需要安装第三方依赖：deepdiff
 # 填写要监控的GitHub仓库的用户名和仓库名
 export GitRepoHost="QiYueYiya/scripts"
+# 要监控的脚本关键词，不填默认为opencard
+export GitScripts="opencard"
 # 运行完开卡脚本后禁用开卡脚本定时任务，false为不禁用
 export opencardDisable="true"
 # 通知变量，当有开卡脚本更新的时候进行通知
@@ -120,9 +122,12 @@ def main():
         List.append(f'请求失败：{api}')
         return
     # 只保存目录树中的开卡脚本的文件名信息
+    GitScripts = "opencard"
+    if 'GitScripts' in os.environ:
+        GitScripts = os.environ["GitScripts"]
     tree = []
     for x in rsp.json()["tree"]:
-        if "opencard" in x["path"]:
+        if GitScripts in x["path"]:
             tree.append(x["path"])
     # 查看是否有tree.json文件
     if not os.path.exists("./tree.json"):
