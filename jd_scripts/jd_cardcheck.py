@@ -160,10 +160,6 @@ def main():
     with open("./tree.json","w") as f:
         List.append("保存数据到tree.json文件")
         json.dump(tree,f)
-    tt = '\n'.join(List)
-    print(tt)
-    if (state) and ('QYWX_Server' in os.environ):
-        push('监控开卡', tt)
 
 if 'QYWX_Server' in os.environ:
     qywx = os.environ['QYWX_Server'].split(',')
@@ -183,6 +179,10 @@ if 'GitRepoHost' in os.environ:
     }
     session = requests.session()
     main()
+    tt = '\n'.join(List)
+    print(tt)
+    if (state) and ('QYWX_Server' in os.environ):
+        push('监控开卡', tt)
 else:
     print("请查看脚本注释后设置相关变量")
  
