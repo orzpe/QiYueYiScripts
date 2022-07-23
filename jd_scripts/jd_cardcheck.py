@@ -14,7 +14,7 @@ export opencardDisable="true"
 # 参考文档：http://note.youdao.com/s/HMiudGkb，下方填写（corpid,corpsecret,touser,agentid）
 export QYWX_Server=""
 
-cron: */5 0-3 * * *
+cron: */5 0-4 * * *
 new Env('开卡更新检测')
 """
 
@@ -83,7 +83,7 @@ def qlrun(scripts_name):
         List.append(f"没有找到{scripts_name}文件，即将更新仓库")
         rsp = session.put(url=url,headers=headers,data=json.dumps(RepoID))
         if rsp.status_code == 200:
-            List.append(f"运行任务：{RepoName}")
+            List.append(f"运行拉库任务：{RepoName}")
         else:
             List.append(f'请求失败：{url}')
             List.append("错误信息："+rsp.json()["message"])
@@ -112,7 +112,7 @@ def qlrun(scripts_name):
     # 运行开卡任务
     rsp = session.put(url=url,headers=headers,data=json.dumps(TaskID))
     if rsp.status_code == 200:
-        List.append(f"运行任务：{TaskName}")
+        List.append(f"运行开卡任务：{TaskName}")
     else:
         List.append(f'请求失败：{url}')
         List.append("错误信息："+rsp.json()["message"])
@@ -123,7 +123,7 @@ def main():
     rsp = session.get(url=api,headers=headers)
     if rsp.status_code != 200:
         List.append(f'请求失败：{api}')
-        return
+        return state
     # 只保存目录树中的开卡脚本的文件名信息
     GitScripts = "opencard"
     if 'GitScripts' in os.environ:
@@ -136,7 +136,7 @@ def main():
     if not os.path.exists("./tree.json"):
         with open("./tree.json","w") as f:
             json.dump(tree,f)
-        List.append("没有找到tree.json文件！即将保存数据为tree.json文件")
+        print("没有找到tree.json文件！即将保存数据为tree.json文件")
     # 读取上一次保存的tree.json并与当前tree进行对比
     with open("./tree.json", 'rb') as json_file:
         tree_json = json.load(json_file)
@@ -160,7 +160,7 @@ def main():
         List.append("没有新增开卡脚本")
         state=False
     with open("./tree.json","w") as f:
-        List.append("保存数据到tree.json文件")
+        print("保存数据到tree.json文件")
         json.dump(tree,f)
     return state
 
