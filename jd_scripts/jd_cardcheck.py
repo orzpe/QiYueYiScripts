@@ -48,13 +48,13 @@ def push(title,content):
 def qlcron(name):
     url = host+"/crons?searchValue="+name
     rsp = session.get(url=url, headers=headers)
-    jsons = json.loads(rsp.text)
+    jsons = rsp.json()
     if rsp.status_code == 200:
         List.append("获取任务ID成功："+jsons["data"][0]["name"])
         return jsons["data"][0]["name"],[jsons["data"][0]["_id"]]
     else:
         List.append(f'请求失败：{url}')
-        List.append("错误信息："+json.loads(rsp.text)["message"])
+        List.append("错误信息："+rsp.json()["message"])
         return False,False
 
 def qlrun(scripts_name):
@@ -84,7 +84,7 @@ def qlrun(scripts_name):
             List.append(f"运行任务：{RepoName}")
         else:
             List.append(f'请求失败：{url}')
-            List.append("错误信息："+json.loads(rsp.text)["message"])
+            List.append("错误信息："+rsp.json()["message"])
             return
         sleep(10)
         File = os.path.exists("/ql/scripts/"+GitPath[0]+"_"+GitPath[1]+"/"+scripts_name)
@@ -99,7 +99,7 @@ def qlrun(scripts_name):
         List.append(f"运行任务：{TaskName}")
     else:
         List.append(f'请求失败：{url}')
-        List.append("错误信息："+json.loads(rsp.text)["message"])
+        List.append("错误信息："+rsp.json()["message"])
         return
     # 禁用开卡任务
     if 'opencardDisable' in os.environ:
@@ -121,7 +121,7 @@ def main():
         return
     # 只保存目录树中的开卡脚本的文件名信息
     tree = []
-    for x in json.loads(rsp.text)["tree"]:
+    for x in rsp.json()["tree"]:
         if "opencard" in x["path"]:
             tree.append(x["path"])
     # 查看是否有tree.json文件
