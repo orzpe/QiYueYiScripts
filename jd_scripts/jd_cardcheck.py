@@ -6,7 +6,8 @@
 # 此脚本需要安装第三方依赖：deepdiff
 # 填写要监控的GitHub仓库的用户名和仓库名
 export GitRepoHost="QiYueYiya/scripts"
-
+# 运行完开卡脚本后禁用开卡脚本定时任务
+export opencardDisable="true"
 ## 参考文档：http://note.youdao.com/s/HMiudGkb
 ## 下方填写（corpid,corpsecret,touser,agentid）
 export QYWX_AM=""
@@ -100,6 +101,17 @@ def qlrun(scripts_name):
         List.append(f'请求失败：{url}')
         List.append("错误信息："+json.loads(rsp.text)["message"])
         return
+    # 禁用开卡任务
+    if 'opencardDisable' in os.environ:
+        Disable = os.environ['opencardDisable']
+        if Disable=="true":
+            url = host+"/crons/disable"
+            rsp = session.put(url=url,headers=headers,data=json.dumps(TaskID))
+            if rsp.status_code == 200:
+                List.append(f"禁用任务：{TaskName}")
+            else:
+                List.append(f'请求失败：{url}')
+                List.append("错误信息："+rsp.json()["message"])
 
 def main():
     # 请求Github仓库获取目录树
