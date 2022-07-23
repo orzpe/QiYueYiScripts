@@ -60,6 +60,7 @@ def qlcron(name):
         return False,False
 
 def qlrun(scripts_name):
+    state=True
     # 读取青龙登录token
     with open("/ql/config/auth.json", 'rb') as json_file:
         authjson = json.load(json_file)
@@ -138,7 +139,6 @@ def main():
     with open("./tree.json", 'rb') as json_file:
         tree_json = json.load(json_file)
     diff = deepdiff.DeepDiff(tree_json, tree)
-    state=True
     # 判断是否有新增开卡脚本
     if "values_changed" in diff:
         for x in diff["values_changed"]:
@@ -160,6 +160,7 @@ def main():
     with open("./tree.json","w") as f:
         List.append("保存数据到tree.json文件")
         json.dump(tree,f)
+    return state
 
 if 'QYWX_Server' in os.environ:
     qywx = os.environ['QYWX_Server'].split(',')
@@ -178,7 +179,7 @@ if 'GitRepoHost' in os.environ:
         "Content-Type": "application/json;charset=UTF-8"
     }
     session = requests.session()
-    main()
+    state = main()
     tt = '\n'.join(List)
     print(tt)
     if (state) and ('QYWX_Server' in os.environ):
