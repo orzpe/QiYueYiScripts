@@ -12,7 +12,7 @@ export opencardDisable="true"
 ## 下方填写（corpid,corpsecret,touser,agentid）
 export QYWX_AM=""
 
-cron: */5 0-6 * * *
+cron: */5 0-3 * * *
 new Env('开卡更新检测')
 """
 
