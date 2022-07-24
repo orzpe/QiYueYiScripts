@@ -160,13 +160,6 @@ def main():
         json.dump(tree,f)
     return state
 
-if 'QYWX_Server' in os.environ:
-    qywx = os.environ['QYWX_Server'].split(',')
-    corpid = qywx[0]
-    corpsecret = qywx[1]
-    touser = qywx[2]
-    agentid = qywx[3]
-    mediaid = qywx[4]
 if 'GitRepoHost' in os.environ:
     session = requests.session()
     host = 'http://127.0.0.1:5700/api'
