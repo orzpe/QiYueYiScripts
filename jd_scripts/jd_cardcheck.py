@@ -6,7 +6,7 @@
 # 如果发现当前已有多个相关开卡任务时，将不会再运行开卡任务
 # 此脚本需要安装第三方依赖：deepdiff
 
-# 填写要监控的GitHub仓库的用户名和仓库名和分支和脚本关键词
+# 填写要监控的GitHub仓库的 用户名/仓库名/分支/脚本关键词
 # 监控多个仓库请用 & 隔开
 export GitRepoHost="QiYueYiya/scripts/main/opencard&QiYueYiya/jdscripts/master/opencardL"
 # 运行开卡脚本前禁用开卡脚本定时任务，不填则不禁用
