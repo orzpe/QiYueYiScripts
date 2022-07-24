@@ -20,7 +20,7 @@ new Env('开卡更新检测')
 """
 
 from time import sleep
-from notify import send
+from sendNotify import send
 import requests,deepdiff,json,os
 
 # 获取脚本ID
