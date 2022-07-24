@@ -2,9 +2,11 @@
 # -*- coding: utf8 -*-
 """
 # 通过监控Github仓库来查看是否有新的开卡脚本
-# 如果有则自动拉库并运行开卡脚本
+# 如果新的开卡脚本则自动拉库并运行相关开卡任务
+# 如果发现当前已有多个相关开卡任务时，将不会再运行开卡任务
 # 此脚本需要安装第三方依赖：deepdiff
-# 填写要监控的GitHub仓库的用户名/仓库名/分支/脚本关键词
+
+# 填写要监控的GitHub仓库的用户名和仓库名和分支和脚本关键词
 # 监控多个仓库请用 & 隔开
 export GitRepoHost="QiYueYiya/scripts/main/opencard&QiYueYiya/jdscripts/master/opencardL"
 # 运行开卡脚本前禁用开卡脚本定时任务，不填则不禁用
@@ -47,10 +49,10 @@ def qlcron(name):
     jsons = rsp.json()
     if rsp.status_code == 200:
         if len(jsons["data"]):
-            List.append("获取任务ID成功："+jsons["data"][0]["name"])
+            List.append("获取任务信息成功："+jsons["data"][0]["name"])
             return jsons["data"][0]["name"],[jsons["data"][0]["_id"]]
         else:
-            List.append("没有找到任务，无法获取任务ID")
+            List.append("没有找到任务，无法获取任务信息")
             return False,False
     else:
         List.append(f'请求失败：{url}')
@@ -69,10 +71,10 @@ def qlrun(scripts_name):
     # 向请求头添加青龙登录Token
     headers['Authorization']='Bearer '+token
     url = host+"/crons/run"
-    # 获取仓库任务ID
+    # 获取仓库任务信息
     RepoName,RepoID = qlcron(GitRepo)
     if not RepoName:
-        List.append(f"获取仓库任务ID失败：{GitRepo}")
+        List.append(f"获取仓库任务信息失败：{GitRepo}")
         return
     # 运行拉取仓库任务
     File = os.path.exists("/ql/scripts/"+GitRepoHost[0]+"_"+GitRepoHost[1]+"/"+scripts_name)
@@ -88,11 +90,11 @@ def qlrun(scripts_name):
         sleep(10)
         File = os.path.exists("/ql/scripts/"+GitRepoHost[0]+"_"+GitRepoHost[1]+"/"+scripts_name)
     else:
-        List.append(f"已找到{scripts_name}文件，即将获取开卡任务ID")
-    # 获取开卡任务ID
+        List.append(f"已找到{scripts_name}文件，即将获取相关任务信息")
+    # 获取开卡任务信息
     TaskName,TaskID = qlcron(scripts_name)
     if not TaskName:
-        List.append(f"获取开卡任务ID失败：{scripts_name}")
+        List.append(f"获取开卡任务信息失败：{scripts_name}")
         return
     # 禁用开卡任务
     if 'opencardDisable' in os.environ:
@@ -106,6 +108,23 @@ def qlrun(scripts_name):
                 List.append(f'请求失败：{url}')
                 List.append("错误信息："+rsp.json()["message"])
                 return
+    # 查找当前是否有多个同名开卡任务
+    namename = TaskName.split(" ")
+    if len(namename)>1:
+        namename = namename[1]
+    else:
+        namename = namename[0]
+    vurl = host+"/crons?searchValue="+namename
+    rsp = session.get(url=vurl, headers=headers).json()
+    if len(rsp["data"])>1:
+        List.append(f"找到多个开卡任务：{TaskName}")
+        # 通过过去时间里有无运行任务来判断是否要运行当前更新的脚本，以后再写
+        # for a in rsp["data"]:
+        #     xurl = host+"/crons/"+a["_id"]
+        #     xrsp = session.get(url=xurl, headers=headers).json()
+        #     if xrsp["data"]["last_execution_time"]:
+        List.append(f"将不再运行此开卡任务")
+        return
     # 运行开卡任务
     rsp = session.put(url=url,headers=headers,data=json.dumps(TaskID))
     if rsp.status_code == 200:
