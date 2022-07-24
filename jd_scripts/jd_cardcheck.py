@@ -61,7 +61,7 @@ def qlcron(name):
             List.append("没有找到任务，无法获取任务信息")
             return False,False
     else:
-        List.append(f'请求失败：{url}')
+        List.append(f'请求青龙失败：{url}')
         List.append("错误信息："+jsons["message"])
         return False,False
 
@@ -90,7 +90,7 @@ def qlrun(scripts_name):
         if rsp.status_code == 200:
             List.append(f"运行拉库任务：{RepoName}")
         else:
-            List.append(f'请求失败：{url}')
+            List.append(f'请求青龙失败：{url}')
             List.append("错误信息："+rsp.json()["message"])
             return
         sleep(10)
@@ -111,7 +111,7 @@ def qlrun(scripts_name):
             if rsp.status_code == 200:
                 List.append(f"禁用开卡任务：{TaskName}")
             else:
-                List.append(f'请求链接失败：{url}')
+                List.append(f'请求青龙失败：{url}')
                 List.append("错误信息："+rsp.json()["message"])
                 return
     # 查找当前是否有多个同名开卡任务
@@ -138,7 +138,7 @@ def qlrun(scripts_name):
     if rsp.status_code == 200:
         List.append(f"运行开卡任务：{TaskName}")
     else:
-        List.append(f'请求失败：{url}')
+        List.append(f'请求青龙失败：{url}')
         List.append("错误信息："+rsp.json()["message"])
         
 def main():
@@ -146,7 +146,7 @@ def main():
     # 请求Github仓库获取目录树
     rsp = session.get(url=api,headers=headers)
     if rsp.status_code != 200:
-        List.append(f'请求失败：{api}')
+        List.append(f'请求GitHub失败：{api}')
         return state
     # 只保存目录树中的开卡脚本的文件名信息
     tree = []
