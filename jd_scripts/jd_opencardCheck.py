@@ -11,9 +11,6 @@
 export GitRepoHost="QiYueYiya/scripts/main/opencard&QiYueYiya/jdscripts/master/opencardL"
 # 运行开卡脚本前禁用开卡脚本定时任务，不填则不禁用
 export opencardDisable="true"
-# 通知变量，当有开卡脚本更新的时候进行通知，不填则不通知
-# 参考文档：http://note.youdao.com/s/HMiudGkb，下方填写（corpid,corpsecret,touser,agentid,图片素材ID）
-export QYWX_Server=""
 
 cron: */5 0-3 * * *
 new Env('开卡更新检测')
