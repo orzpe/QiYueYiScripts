@@ -4,13 +4,12 @@
 # 通过监控Github仓库来查看是否有新的开卡脚本
 # 如果有则自动拉库并运行开卡脚本
 # 此脚本需要安装第三方依赖：deepdiff
-# 填写要监控的GitHub仓库的用户名和仓库名和分支
-export GitRepoHost="QiYueYiya/scripts/main"
-# 要监控的脚本关键词，不填默认为opencard
-export GitScripts="opencard"
-# 运行完开卡脚本后禁用开卡脚本定时任务，false为不禁用
+# 填写要监控的GitHub仓库的用户名和仓库名和分支和脚本关键词
+# 监控多个仓库请用 & 隔开
+export GitRepoHost="QiYueYiya/scripts/main/opencard&QiYueYiya/jdscripts/master/opencardL"
+# 运行开卡脚本前禁用开卡脚本定时任务，false为不禁用
 export opencardDisable="true"
-# 通知变量，当有开卡脚本更新的时候进行通知
+# 通知变量，当有开卡脚本更新的时候进行通知，不填则不通知
 # 参考文档：http://note.youdao.com/s/HMiudGkb，下方填写（corpid,corpsecret,touser,agentid）
 export QYWX_Server=""
 
@@ -63,7 +62,6 @@ def qlcron(name):
         return False,False
 
 def qlrun(scripts_name):
-    state=True
     # 读取青龙登录token
     with open("/ql/config/auth.json", 'rb') as json_file:
         authjson = json.load(json_file)
@@ -72,9 +70,9 @@ def qlrun(scripts_name):
     else:
         List.append("青龙Token获取失败")
         return
-    url = host+"/crons/run"
     # 向请求头添加青龙登录Token
     headers['Authorization']='Bearer '+token
+    url = host+"/crons/run"
     # 获取仓库任务ID
     RepoName,RepoID = qlcron(GitRepo)
     if not RepoName:
@@ -128,20 +126,17 @@ def main():
         List.append(f'请求失败：{api}')
         return state
     # 只保存目录树中的开卡脚本的文件名信息
-    GitScripts = "opencard"
-    if 'GitScripts' in os.environ:
-        GitScripts = os.environ["GitScripts"]
     tree = []
     for x in rsp.json()["tree"]:
-        if GitScripts in x["path"]:
+        if GitRepoHost[3] in x["path"]:
             tree.append(x["path"])
     # 查看是否有tree.json文件
-    if not os.path.exists("./tree.json"):
-        with open("./tree.json","w") as f:
+    if not os.path.exists(f"/ql/scripts/{GitRepoHost[0]}_{GitRepoHost[1]}/tree.json"):
+        with open(f"/ql/scripts/{GitRepoHost[0]}_{GitRepoHost[1]}/tree.json","w") as f:
             json.dump(tree,f)
-        print("没有找到tree.json文件！即将保存数据为tree.json文件")
+        List.append(f"没有找到{GitRepoHost[0]}_{GitRepoHost[1]}/tree.json文件！将自动生成")
     # 读取上一次保存的tree.json并与当前tree进行对比
-    with open("./tree.json", 'rb') as json_file:
+    with open(f"/ql/scripts/{GitRepoHost[0]}_{GitRepoHost[1]}/tree.json", 'rb') as json_file:
         tree_json = json.load(json_file)
     diff = deepdiff.DeepDiff(tree_json, tree)
     # 判断是否有新增开卡脚本
@@ -162,8 +157,8 @@ def main():
     else:
         List.append("没有新增开卡脚本")
         state=False
-    with open("./tree.json","w") as f:
-        print("保存数据到tree.json文件")
+    with open(f"/ql/scripts/{GitRepoHost[0]}_{GitRepoHost[1]}/tree.json","w") as f:
+        List.append(f"保存数据到{GitRepoHost[0]}_{GitRepoHost[1]}/tree.json文件")
         json.dump(tree,f)
     return state
 
@@ -174,22 +169,24 @@ if 'QYWX_Server' in os.environ:
     touser = qywx[2]
     agentid = qywx[3]
 if 'GitRepoHost' in os.environ:
-    List = []
-    GitRepoHost = os.environ['GitRepoHost'].split("/")
-    GitRepo = GitRepoHost[0]+"/"+GitRepoHost[1]
-    GitBranch = GitRepoHost[2]
-    List.append(f"监控仓库：https://github.com/{GitRepo}")
-    api = f'https://api.github.com/repos/{GitRepo}/git/trees/{GitBranch}'
     host = 'http://127.0.0.1:5700/api'
     headers = {
         "Content-Type": "application/json;charset=UTF-8"
     }
     session = requests.session()
-    state = main()
-    tt = '\n'.join(List)
-    print(tt)
-    if (state) and ('QYWX_Server' in os.environ):
-        push('监控开卡', tt)
+    RepoHost = os.environ['GitRepoHost'].split("&")
+    for RepoX in RepoHost:
+        List = []
+        GitRepoHost = RepoX.split("/")
+        GitRepo = GitRepoHost[0]+"/"+GitRepoHost[1]
+        GitBranch = GitRepoHost[2]
+        List.append(f"监控仓库：https://github.com/{GitRepo}")
+        api = f'https://api.github.com/repos/{GitRepo}/git/trees/{GitBranch}'
+        state = main()
+        tt = '\n'.join(List)
+        print(tt)
+        if (state) and ('QYWX_Server' in os.environ):
+            push('监控开卡', tt)
 else:
     print("请查看脚本注释后设置相关变量")
  
