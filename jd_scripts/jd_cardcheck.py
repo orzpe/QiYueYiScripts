@@ -3,7 +3,7 @@
 """
 # 通过监控Github仓库来查看是否有新的开卡脚本
 # 如果新的开卡脚本则自动拉库并运行相关开卡任务
-# 如果发现当前已有多个相关开卡任务时，将不会再运行开卡任务
+# 如果发现已有多个相关开卡任务时，并且其中一个开卡任务已经运行过了或者正在运行，之后更新的开卡任务将不会再运行
 # 此脚本需要安装第三方依赖：deepdiff
 
 # 填写要监控的GitHub仓库的 用户名/仓库名/分支/脚本关键词
@@ -15,38 +15,13 @@ export opencardDisable="true"
 # 参考文档：http://note.youdao.com/s/HMiudGkb，下方填写（corpid,corpsecret,touser,agentid,图片素材ID）
 export QYWX_Server=""
 
-cron: */5 0-4 * * *
+cron: */5 0-3 * * *
 new Env('开卡更新检测')
 """
 
 from time import sleep
+from notify import send
 import requests,deepdiff,json,os
-
-# 企业微信推送
-def push(title,content):
-    # 获得access_token
-    url = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=' + corpid + '&corpsecret=' + corpsecret
-    re = requests.get(url).json()
-    access_token = re['access_token']
-    url1 = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token="+ access_token
-    data = {
-       "touser": touser,
-       "msgtype": "mpnews",
-       "agentid": agentid,
-       "mpnews" : {
-           "articles":[{
-                "title": title, 
-                "thumb_media_id": mediaid,
-                "content": content
-            }]
-        },
-    }
-    # 字符串格式
-    re1 = requests.post(url=url1, data=json.dumps(data)).json()
-    if re1['errcode'] == 0:
-        print("推送成功")
-    else:
-        print("推送失败")
 
 # 获取脚本ID
 def qlcron(name):
@@ -55,14 +30,13 @@ def qlcron(name):
     jsons = rsp.json()
     if rsp.status_code == 200:
         if len(jsons["data"]):
-            List.append("获取任务信息成功："+jsons["data"][0]["name"])
+            List.append("获取任务成功："+jsons["data"][0]["name"])
             return jsons["data"][0]["name"],[jsons["data"][0]["_id"]]
         else:
-            List.append("没有找到任务，无法获取任务信息")
+            List.append(f"没有找到任务：{name}")
             return False,False
     else:
         List.append(f'请求青龙失败：{url}')
-        List.append("错误信息："+jsons["message"])
         return False,False
 
 def qlrun(scripts_name):
@@ -123,14 +97,15 @@ def qlrun(scripts_name):
     vurl = host+"/crons?searchValue="+namename
     rsp = session.get(url=vurl, headers=headers).json()
     if len(rsp["data"])>1:
-        List.append(f"找到多个任务：{TaskName}")
+        List.append(f"找到多个任务：{namename}")
         # 查看当前任务是否运行过
         for a in rsp["data"]:
             xurl = host+"/crons/"+a["_id"]
             xrsp = session.get(url=xurl, headers=headers).json()
             if "last_execution_time" in xrsp["data"]:
-                List.append("该任务曾运行："+xrsp["data"]["name"]+"\n放弃运行任务"+TaskName)
-                break
+                List.append("该任务曾运行："+xrsp["data"]["name"])
+                List.append("放弃运行任务："+TaskName)
+                return
             else:
                 List.append("从未运行任务："+xrsp["data"]["name"])
     # 运行开卡任务
@@ -208,7 +183,7 @@ if 'GitRepoHost' in os.environ:
         tt = '\n'.join(List)
         print(tt)
         if (state) and ('QYWX_Server' in os.environ):
-            push('开卡更新检测', tt)
+            send('开卡更新检测', tt)
 else:
     print("请查看脚本注释后设置相关变量")
  
