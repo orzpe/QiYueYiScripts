@@ -56,7 +56,7 @@ def qlrun(scripts_name):
     # 运行拉取仓库任务
     File = os.path.exists("/ql/scripts/"+GitRepoHost[0]+"_"+GitRepoHost[1]+"/"+scripts_name)
     while not File:
-        List.append(f"没有找到{scripts_name}文件，即将更新仓库")
+        List.append("没有找到脚本："+GitRepoHost[0]+"_"+GitRepoHost[1]+"/"+scripts_name)
         rsp = session.put(url=url,headers=headers,data=json.dumps(RepoID))
         if rsp.status_code == 200:
             List.append(f"运行拉库任务：{RepoName}")
@@ -67,7 +67,7 @@ def qlrun(scripts_name):
         sleep(10)
         File = os.path.exists("/ql/scripts/"+GitRepoHost[0]+"_"+GitRepoHost[1]+"/"+scripts_name)
     else:
-        List.append(f"已找到{scripts_name}文件，即将获取相关任务信息")
+        List.append("找到开卡脚本："+GitRepoHost[0]+"_"+GitRepoHost[1]+"/"+scripts_name)
     # 获取开卡任务信息
     TaskName,TaskID = qlcron(scripts_name)
     if not TaskName:
