@@ -1,15 +1,16 @@
 #!/usr/bin/python3
 # -*- coding: utf8 -*-
 """
-# 通过监控Github仓库来查看是否有新的开卡脚本
-# 如果新的开卡脚本则自动拉库并运行相关开卡任务
-# 如果发现已有多个相关开卡任务时，并且其中一个开卡任务已经运行过了或者正在运行，之后更新的开卡任务将不会再运行
+# 注意！不支持青龙2.10.3以下版本
 # 此脚本需要安装第三方依赖：deepdiff
+# 青龙里面要有监控的Github仓库的拉库命令，通过监控Github仓库来查看是否有新的开卡脚本
+# 如果发现新的开卡脚本则自动拉库并运行开卡脚本，如果发现已有多个相同开卡脚本时
+# 且其中一个开卡脚本已经运行过了或者正在运行，之后更新的开卡脚本将不会再运行
 
 # 填写要监控的GitHub仓库的 用户名/仓库名/分支/脚本关键词
 # 监控多个仓库请用 & 隔开
-export GitRepoHost="QiYueYiya/scripts/main/opencard&QiYueYiya/jdscripts/master/opencardL"
-# 运行开卡脚本前禁用开卡脚本定时任务，不填则不禁用
+export GitRepoHost="KingRan/KR/main/opencardL&feverrun/my_scripts/main/jd_opencard&smiek2121/scripts/master/opencard&okyyds/yyds/master/lzdz1"
+# 运行开卡脚本前禁用开卡脚本定时任务，不填则不禁用，保留原有定时
 export opencardDisable="true"
 
 cron: */5 0-3 * * *
@@ -55,7 +56,10 @@ def qlrun(scripts_name):
         List.append(f"获取仓库任务信息失败：{GitRepo}")
         return
     # 运行拉取仓库任务
-    File = os.path.exists(f"{path}/scripts/"+GitRepoHost[0]+"_"+GitRepoHost[1]+"/"+scripts_name)
+    scriptspath = path+"/scripts/"+GitRepoHost[0]+"_"+GitRepoHost[1]
+    if not os.path.exists(scriptspath):
+        scriptspath = path+"/scripts/"+GitRepoHost[0]+"_"+GitRepoHost[1]+"_"+GitRepoHost[2]
+    File = os.path.exists(scriptspath)
     while not File:
         List.append("没有找到脚本："+GitRepoHost[0]+"_"+GitRepoHost[1]+"/"+scripts_name)
         rsp = session.put(url=url,headers=headers,data=json.dumps(RepoID))
@@ -66,7 +70,7 @@ def qlrun(scripts_name):
             List.append("错误信息："+rsp.json()["message"])
             return
         sleep(10)
-        File = os.path.exists(f"{path}/scripts/"+GitRepoHost[0]+"_"+GitRepoHost[1]+"/"+scripts_name)
+        File = os.path.exists(scriptspath)
     else:
         List.append("找到开卡脚本："+GitRepoHost[0]+"_"+GitRepoHost[1]+"/"+scripts_name)
     # 获取开卡任务信息
@@ -127,12 +131,12 @@ def main():
         if GitRepoHost[3] in x["path"]:
             tree.append(x["path"])
     # 查看是否有tree.json文件
-    if not os.path.exists(f"{path}/scripts/{GitRepoHost[0]}_{GitRepoHost[1]}/tree.json"):
-        with open(f"{path}/scripts/{GitRepoHost[0]}_{GitRepoHost[1]}/tree.json","w") as f:
+    if not os.path.exists(f"{path}/scripts/tree_{GitRepoHost[0]}.json"):
+        with open(f"{path}/scripts/tree_{GitRepoHost[0]}.json","w") as f:
             json.dump(tree,f)
-        List.append(f"没有找到{GitRepoHost[0]}_{GitRepoHost[1]}/tree.json文件！将自动生成")
+        List.append(f"没有找到tree_{GitRepoHost[0]}.json文件！将自动生成")
     # 读取上一次保存的tree.json并与当前tree进行对比
-    with open(f"{path}/scripts/{GitRepoHost[0]}_{GitRepoHost[1]}/tree.json", 'rb') as json_file:
+    with open(f"{path}/scripts/tree_{GitRepoHost[0]}.json", 'rb') as json_file:
         tree_json = json.load(json_file)
     diff = deepdiff.DeepDiff(tree_json, tree)
     # 判断是否有新增开卡脚本
@@ -153,8 +157,8 @@ def main():
     else:
         List.append("没有新增开卡脚本")
         state=False
-    with open(f"{path}/scripts/{GitRepoHost[0]}_{GitRepoHost[1]}/tree.json","w") as f:
-        List.append(f"保存数据到{GitRepoHost[0]}_{GitRepoHost[1]}/tree.json文件")
+    with open(f"{path}/scripts/tree_{GitRepoHost[0]}.json","w") as f:
+        List.append(f"保存数据到tree_{GitRepoHost[0]}.json文件")
         json.dump(tree,f)
     return state
 
@@ -162,8 +166,9 @@ if 'GitRepoHost' in os.environ:
     session = requests.session()
     host = 'http://127.0.0.1:5700/api'
     RepoHost = os.environ['GitRepoHost'].split("&")
-    File = os.path.exists("/ql/data")
-    if File:
+    datapath = os.path.exists("/ql/data")
+    print("注意！不支持青龙2.10.3以下版本")
+    if datapath:
         print("当前青龙版本高于2.12.0")
         path = "/ql/data"
     else:
