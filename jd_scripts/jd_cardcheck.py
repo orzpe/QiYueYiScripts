@@ -7,7 +7,7 @@
 # 填写要监控的GitHub仓库的用户名和仓库名和分支和脚本关键词
 # 监控多个仓库请用 & 隔开
 export GitRepoHost="QiYueYiya/scripts/main/opencard&QiYueYiya/jdscripts/master/opencardL"
-# 运行开卡脚本前禁用开卡脚本定时任务，false为不禁用
+# 运行开卡脚本前禁用开卡脚本定时任务，不填则不禁用
 export opencardDisable="true"
 # 通知变量，当有开卡脚本更新的时候进行通知，不填则不通知
 # 参考文档：http://note.youdao.com/s/HMiudGkb，下方填写（corpid,corpsecret,touser,agentid）
@@ -28,15 +28,10 @@ def push(title,content):
     access_token = re['access_token']
     url1 = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token="+ access_token
     data = {
-       "touser" : touser,
-       "msgtype" : "news",
-       "agentid" : agentid,
-       "news" : {
-       "articles" : [{
-               "title" : title,
-               "description" : content,
-            }]
-        }
+       "touser": touser,
+       "msgtype": "news",
+       "agentid": agentid,
+       "news": {"articles": [{"title": title,"description": content,}]}
     }
     # 字符串格式
     re1 = requests.post(url=url1, data=json.dumps(data)).json()
@@ -51,11 +46,12 @@ def qlcron(name):
     rsp = session.get(url=url, headers=headers)
     jsons = rsp.json()
     if rsp.status_code == 200:
-        if jsons["data"] == None:
-            List.append("没有找到任务，无法获取任务ID")
-        else:
+        if len(jsons["data"]):
             List.append("获取任务ID成功："+jsons["data"][0]["name"])
             return jsons["data"][0]["name"],[jsons["data"][0]["_id"]]
+        else:
+            List.append("没有找到任务，无法获取任务ID")
+            return False,False
     else:
         List.append(f'请求失败：{url}')
         List.append("错误信息："+jsons["message"])
@@ -169,14 +165,12 @@ if 'QYWX_Server' in os.environ:
     touser = qywx[2]
     agentid = qywx[3]
 if 'GitRepoHost' in os.environ:
-    host = 'http://127.0.0.1:5700/api'
-    headers = {
-        "Content-Type": "application/json;charset=UTF-8"
-    }
     session = requests.session()
+    host = 'http://127.0.0.1:5700/api'
     RepoHost = os.environ['GitRepoHost'].split("&")
     for RepoX in RepoHost:
         List = []
+        headers = {"Content-Type": "application/json;charset=UTF-8"}
         GitRepoHost = RepoX.split("/")
         GitRepo = GitRepoHost[0]+"/"+GitRepoHost[1]
         GitBranch = GitRepoHost[2]
