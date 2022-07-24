@@ -175,7 +175,7 @@ if 'GitRepoHost' in os.environ:
         state = main()
         tt = '\n'.join(List)
         print(tt)
-        if (state) and ('QYWX_Server' in os.environ):
+        if state:
             send('开卡更新检测', tt)
 else:
     print("请查看脚本注释后设置相关变量")
