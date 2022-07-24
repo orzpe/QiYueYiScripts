@@ -10,5 +10,5 @@
 
 任务 :
 ```
-ql repo https://github.com/QiYueYiya/scripts.git "d_|jd_" "backup" "jdCookie|notify|USER|magic"
+ql repo https://github.com/QiYueYiya/scripts.git "d_|jd_" "backup" "jdCookie|notify|USER"
 ```
