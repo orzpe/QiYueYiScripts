@@ -12,7 +12,7 @@ export GitRepoHost="QiYueYiya/scripts/main/opencard&QiYueYiya/jdscripts/master/o
 # 运行开卡脚本前禁用开卡脚本定时任务，不填则不禁用
 export opencardDisable="true"
 # 通知变量，当有开卡脚本更新的时候进行通知，不填则不通知
-# 参考文档：http://note.youdao.com/s/HMiudGkb，下方填写（corpid,corpsecret,touser,agentid）
+# 参考文档：http://note.youdao.com/s/HMiudGkb，下方填写（corpid,corpsecret,touser,agentid,图片素材ID）
 export QYWX_Server=""
 
 cron: */5 0-4 * * *
@@ -31,9 +31,15 @@ def push(title,content):
     url1 = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token="+ access_token
     data = {
        "touser": touser,
-       "msgtype": "news",
+       "msgtype": "mpnews",
        "agentid": agentid,
-       "news": {"articles": [{"title": title,"description": content,}]}
+       "mpnews" : {
+           "articles":[{
+                "title": title, 
+                "thumb_media_id": mediaid,
+                "content": content
+            }]
+        },
     }
     # 字符串格式
     re1 = requests.post(url=url1, data=json.dumps(data)).json()
@@ -103,9 +109,9 @@ def qlrun(scripts_name):
             vurl = host+"/crons/disable"
             rsp = session.put(url=vurl,headers=headers,data=json.dumps(TaskID))
             if rsp.status_code == 200:
-                List.append(f"禁用任务：{TaskName}")
+                List.append(f"禁用开卡任务：{TaskName}")
             else:
-                List.append(f'请求失败：{url}')
+                List.append(f'请求链接失败：{url}')
                 List.append("错误信息："+rsp.json()["message"])
                 return
     # 查找当前是否有多个同名开卡任务
@@ -117,14 +123,16 @@ def qlrun(scripts_name):
     vurl = host+"/crons?searchValue="+namename
     rsp = session.get(url=vurl, headers=headers).json()
     if len(rsp["data"])>1:
-        List.append(f"找到多个开卡任务：{TaskName}")
-        # 通过过去时间里有无运行任务来判断是否要运行当前更新的脚本，以后再写
-        # for a in rsp["data"]:
-        #     xurl = host+"/crons/"+a["_id"]
-        #     xrsp = session.get(url=xurl, headers=headers).json()
-        #     if xrsp["data"]["last_execution_time"]:
-        List.append(f"将不再运行此开卡任务")
-        return
+        List.append(f"找到多个任务：{TaskName}")
+        # 查看当前任务是否运行过
+        for a in rsp["data"]:
+            xurl = host+"/crons/"+a["_id"]
+            xrsp = session.get(url=xurl, headers=headers).json()
+            if "last_execution_time" in xrsp["data"]:
+                List.append("该任务曾运行："+xrsp["data"]["name"]+"\n放弃运行任务"+TaskName)
+                break
+            else:
+                List.append("从未运行任务："+xrsp["data"]["name"])
     # 运行开卡任务
     rsp = session.put(url=url,headers=headers,data=json.dumps(TaskID))
     if rsp.status_code == 200:
@@ -183,6 +191,7 @@ if 'QYWX_Server' in os.environ:
     corpsecret = qywx[1]
     touser = qywx[2]
     agentid = qywx[3]
+    mediaid = qywx[4]
 if 'GitRepoHost' in os.environ:
     session = requests.session()
     host = 'http://127.0.0.1:5700/api'
@@ -199,7 +208,7 @@ if 'GitRepoHost' in os.environ:
         tt = '\n'.join(List)
         print(tt)
         if (state) and ('QYWX_Server' in os.environ):
-            push('监控开卡', tt)
+            push('开卡更新检测', tt)
 else:
     print("请查看脚本注释后设置相关变量")
  
